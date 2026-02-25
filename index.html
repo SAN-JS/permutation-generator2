@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Digital Permutation Lab</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+height:100vh;
+background:url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center/cover;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.card{
+background:rgba(0,0,0,0.65);
+backdrop-filter:blur(15px);
+padding:40px;
+width:600px;
+border-radius:20px;
+color:white;
+box-shadow:0 0 50px rgba(0,255,255,0.5);
+}
+
+h1{
+text-align:center;
+color:#00ffff;
+text-shadow:0 0 20px cyan;
+}
+
+input{
+width:100%;
+padding:12px;
+font-size:18px;
+border:none;
+border-radius:8px;
+margin-top:10px;
+}
+
+button{
+margin-top:15px;
+width:100%;
+padding:12px;
+font-size:18px;
+border:none;
+border-radius:8px;
+background:linear-gradient(45deg,#00ffff,#00ff99);
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 20px cyan;
+}
+
+.rules{
+margin-top:15px;
+font-size:14px;
+color:#ffcccc;
+}
+
+#result{
+margin-top:20px;
+max-height:250px;
+overflow-y:auto;
+}
+
+.perm{
+opacity:0;
+transform:translateY(10px);
+animation:fadeIn 0.4s forwards;
+}
+
+@keyframes fadeIn{
+to{opacity:1;transform:translateY(0);}
+}
+
+.total{
+margin-top:10px;
+font-weight:bold;
+color:#00ffcc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h1>Permutation Generator</h1>
+
+<input type="text" id="word" placeholder="Enter English Word">
+
+<button onclick="generate()">Generate</button>
+
+<div class="rules">
+⚠ Rules:<br>
+• Only English letters (A-Z)<br>
+• No spaces allowed<br>
+• Maximum length: 8 letters
+</div>
+
+<div id="result"></div>
+</div>
+
+<script>
+function generate(){
+
+let word=document.getElementById("word").value;
+let resultDiv=document.getElementById("result");
+resultDiv.innerHTML="";
+
+let regex=/^[A-Za-z]+$/;
+
+if(!regex.test(word)){
+resultDiv.innerHTML="<div style='color:red'>Invalid Input!</div>";
+return;
+}
+
+if(word.length>8){
+resultDiv.innerHTML="<div style='color:red'>Max 8 letters allowed!</div>";
+return;
+}
+
+// Sort letters
+word=word.split('').sort().join('');
+
+let used=new Array(word.length).fill(false);
+let result=[];
+let permutations=[];
+
+function backtrack(current){
+
+if(current.length===word.length){
+permutations.push(current);
+return;
+}
+
+for(let i=0;i<word.length;i++){
+
+if(used[i]) continue;
+
+if(i>0 && word[i]===word[i-1] && !used[i-1]) continue;
+
+used[i]=true;
+backtrack(current+word[i]);
+used[i]=false;
+}
+}
+
+backtrack("");
+
+let index=0;
+
+function showNext(){
+if(index<permutations.length){
+let div=document.createElement("div");
+div.className="perm";
+div.textContent=permutations[index];
+resultDiv.appendChild(div);
+index++;
+setTimeout(showNext,200);
+}else{
+let total=document.createElement("div");
+total.className="total";
+total.textContent="Total Unique Permutations: "+permutations.length;
+resultDiv.appendChild(total);
+}
+}
+
+showNext();
+}
+</script>
+
+</body>
+</html>
